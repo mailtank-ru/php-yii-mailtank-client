@@ -1,28 +1,37 @@
 <?php
-namespace Mailtank\Models;
-
-
-use Mailtank\MailtankClient;
-
 /**
- * Class Subscriber
- * @package Mailtank\models
+ * Class MailtankSubscriber
  *
  * @property string email
  * @property int id
  * @property array properties
  * @property array tags
  */
-class Subscriber extends MailtankRecord
+class MailtankSubscriber extends MailtankRecord
 {
     protected $properties = array();
 
     public $email;
     public $tags = array();
 
+    public static function model($className=__CLASS__)
+    {
+        return parent::model($className);
+    }
+
+    public function rules()
+    {
+        return array(
+            array('email', 'email'),
+            array('email', 'length', 'max' => 255),
+            array('email', 'required'),
+            array('tags, properties', 'safe'),
+        );
+    }
+
     public function getEndpoint()
     {
-        return 'subscribers';
+        return '/subscribers/';
     }
 
     public function setProperties($properties)
@@ -56,10 +65,18 @@ class Subscriber extends MailtankRecord
         }
     }
 
-    public static function findByPk($id) {
-        $client = MailtankClient::getInstance();
 
-
-
+    /**
+     * Returns the list of attribute names of the model.
+     * @return array list of attribute names.
+     */
+    public function attributeNames()
+    {
+        return array_merge_recursive(parent::attributeNames(),array(
+            'email',
+            'tags',
+            'url',
+            'properties',
+        ));
     }
 }

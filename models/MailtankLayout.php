@@ -1,14 +1,17 @@
 <?php
-namespace Mailtank\Models;
-
-
 /**
- * Class Layout
- * @package Mailtank\Models
+ * Class MailtankLayout
  */
-class Layout extends MailtankRecord {
+class MailtankLayout extends MailtankRecord {
     public $markup;
     public $name;
+
+    protected $createOnly = false;
+
+    public static function model($className=__CLASS__)
+	{
+	     return parent::model($className);
+	}
 
     public function rules()
     {
@@ -23,7 +26,7 @@ class Layout extends MailtankRecord {
 
     public function getEndpoint()
     {
-        return 'layouts/';
+        return '/layouts/';
     }
 
     /**
