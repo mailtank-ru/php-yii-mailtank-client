@@ -32,16 +32,15 @@ abstract class MailtankRecord extends \CModel
         $this->setIsNewRecord(true);
     }
 
-    abstract public function getEndpoint();
+    abstract public static function getEndpoint();
 
 
-    public static function model($className=__CLASS__)
+    public static function model($className = __CLASS__)
     {
-        if(isset(self::$_models[$className]))
+        if (isset(self::$_models[$className]))
             return self::$_models[$className];
-        else
-        {
-            $model=self::$_models[$className]=new $className(null);
+        else {
+            $model = self::$_models[$className] = new $className(null);
             return $model;
         }
     }
@@ -57,20 +56,61 @@ abstract class MailtankRecord extends \CModel
         );
     }
 
-    public static function findByPk($pk) {
-        $model = clone self::model();
+    /**
+     * @param string $pk (external_id || id)
+     * @return bool|MailtankRecord
+     * @throws MailtankException
+     */
+    public static function findByPk($pk)
+    {
+        $model = new get_class(self);
 
         if ($model->createOnly) {
             throw new MailtankException('This mailtank model supports only insert method.');
         }
 
         $data = Yii::app()->mailtank->sendRequest(
-            $model->endpoint . $pk,
+            self::getEndpoint() . $pk,
             null,
             'get'
         );
 
-        var_dump($data);
+        if ($data) {
+            $model->setAttributes($data, false);
+            return $model;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param int $page
+     * @return MailtankRecord[]
+     * @throws MailtankException
+     */
+    public static function findAll($page) {
+        $model = new get_class(self);
+
+        if ($model->createOnly) {
+            throw new MailtankException('This mailtank model supports only insert method.');
+        }
+
+        $data = Yii::app()->mailtank->sendRequest(
+            self::getEndpoint() . ($page ? "?page=$page" : ''),
+            null,
+            'get'
+        );
+
+        $models = array();
+        if($data['objects']) {
+            foreach($data['objects'] as $attributes) {
+                $_model = clone $model;
+                $_model->setAttributes($attributes, false);
+                $models[] = $_model;
+            }
+        }
+
+        return $models;
     }
 
     public function save($runValidation = true, $attributes = null)
@@ -83,12 +123,15 @@ abstract class MailtankRecord extends \CModel
 
     public function insert($attributes = null)
     {
+        $this->scenario = 'insert';
         if (!$this->getIsNewRecord())
             throw new MailtankException('The mailtank record cannot be inserted to api because it is not new.');
         if ($this->beforeSave()) {
+            $fields = $this->getAttributes($attributes);
+            $fields = $this->beforeSendAttributes($fields);
             $data = Yii::app()->mailtank->sendRequest(
-                $this->endpoint,
-                json_encode($this->getAttributes($attributes)),
+                self::getEndpoint(),
+                json_encode($fields),
                 'post'
             );
             if (empty($data['id'])) {
@@ -107,25 +150,26 @@ abstract class MailtankRecord extends \CModel
      * @throws MailtankException
      * @return bool
      */
-    public function update($attributes=null) {
-        if($this->getIsNewRecord())
-            throw new MailtankException(\Yii::t('yii','The active record cannot be updated because it is new.'));
-        if($this->beforeSave())
-        {
+    public function update($attributes = null)
+    {
+        $this->scenario = 'update';
+        if ($this->getIsNewRecord())
+            throw new MailtankException(\Yii::t('yii', 'The active record cannot be updated because it is new.'));
+        if ($this->beforeSave()) {
+            $fields = $this->getAttributes($attributes);
+            $fields = $this->beforeSendAttributes($fields);
             $data = Yii::app()->mailtank->sendRequest(
                 $this->url,
-                json_encode($this->getAttributes($attributes)),
+                json_encode($fields),
                 'post'
             );
 
             $this->setAttributes($data, false);
             $this->afterSave();
             return true;
-        }
-        else
+        } else
             return false;
     }
-
 
 
     /**
@@ -143,8 +187,13 @@ abstract class MailtankRecord extends \CModel
     /**
      *
      */
-    public function afterSave() {
+    public function afterSave()
+    {
 
+    }
+
+    public function beforeSendAttributes($fields) {
+        return $fields;
     }
 
     /**

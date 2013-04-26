@@ -25,11 +25,12 @@ class MailtankSubscriber extends MailtankRecord
             array('email', 'email'),
             array('email', 'length', 'max' => 255),
             array('email', 'required'),
+            array('external_id', 'safe'),array('external_id', 'safe'),
             array('tags, properties', 'safe'),
         );
     }
 
-    public function getEndpoint()
+    public static function getEndpoint()
     {
         return '/subscribers/';
     }
@@ -77,6 +78,29 @@ class MailtankSubscriber extends MailtankRecord
             'tags',
             'url',
             'properties',
+            'external_id',
         ));
+    }
+
+    /**
+     * Reassigns tag to specified subscribers
+     * Todo: validate input
+     * Todo: update patch
+     * @param int[] $ids
+     * @param string $tag
+     */
+    public static function patchTags($ids, $tag) {
+        $fields = array(
+            'action' => 'reassign_tag',
+            'data' => array(
+                'subscribers' => $ids,
+                'tag' => $tag
+            )
+        );
+        Yii::app()->mailtank->sendRequest(
+            self::getEndpoint(),
+            json_encode($fields),
+            'PATCH'
+        );
     }
 }
