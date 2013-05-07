@@ -4,20 +4,14 @@
  */
 class MailtankLayout extends MailtankRecord
 {
+    const ENDPOINT = '/layouts/';
+
     public $markup;
     public $name;
+    public $external_id;
 
-    protected $createOnly = false;
+    protected $createOnly = true;
 
-    public static function listStatuses()
-    {
-        return array(
-            0 => 'NOT_ENQUEUED',
-            1 => 'ENQUEUED',
-            2 => 'FAILED',
-            3 => 'SUCCEEDED'
-        );
-    }
 
     public static function model($className = __CLASS__)
     {
@@ -35,31 +29,6 @@ class MailtankLayout extends MailtankRecord
         );
     }
 
-
-    public static function getEndpoint()
-    {
-        return '/layouts/';
-    }
-
-    public function beforeSendAttributes($fields)
-    {
-        $tags = $fields['tags'];
-        $subscribers = $fields['subscribers'];
-
-        unset($fields['tags'], $fields['subscribers']);
-
-        if (!empty($tags)) {
-            $fields['target']['tags'] = $tags;
-        }
-
-        if (!empty($subscribers)) {
-            $fields['target']['subscribers'] = $subscribers;
-        }
-
-        return $fields;
-    }
-
-
     /**
      * Returns the list of attribute names of the model.
      * @return array list of attribute names.
@@ -70,7 +39,6 @@ class MailtankLayout extends MailtankRecord
             'markup',
             'name',
             'external_id',
-            'status'
         ));
     }
 }

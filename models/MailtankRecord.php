@@ -3,6 +3,7 @@
  * Class MailtankRecord
  * @property-read string $endpoint
  * @property-read string $isNewRecord
+ * @var MailtankClient Yii::app()->mailtank
  */
 abstract class MailtankRecord extends \CModel
 {
@@ -12,6 +13,7 @@ abstract class MailtankRecord extends \CModel
     protected $isNewRecord;
 
     private static $_models = array();
+
     /**
      * Tells us if this api endpoint supports all of crud methods or only insert
      * @var bool
@@ -31,8 +33,6 @@ abstract class MailtankRecord extends \CModel
     {
         $this->setIsNewRecord(true);
     }
-
-    abstract public static function getEndpoint();
 
 
     public static function model($className = __CLASS__)
@@ -63,19 +63,23 @@ abstract class MailtankRecord extends \CModel
      */
     public static function findByPk($pk)
     {
-        $model = new get_class(self);
+        $className = get_called_class();
+        $model = new $className;
 
         if ($model->createOnly) {
             throw new MailtankException('This mailtank model supports only insert method.');
         }
 
         $data = Yii::app()->mailtank->sendRequest(
-            self::getEndpoint() . $pk,
+            $model::ENDPOINT . $pk,
             null,
             'get'
         );
 
         if ($data) {
+            if(!empty($data['message'])) {
+                return false;
+            }
             $model->setAttributes($data, false);
             return $model;
         }
@@ -129,18 +133,20 @@ abstract class MailtankRecord extends \CModel
         if ($this->beforeSave()) {
             $fields = $this->getAttributes($attributes);
             $fields = $this->beforeSendAttributes($fields);
+            unset($fields['id']);
             $data = Yii::app()->mailtank->sendRequest(
-                self::getEndpoint(),
+                $this::ENDPOINT,
                 json_encode($fields),
                 'post'
             );
             if (empty($data['id'])) {
-                throw new MailtankException('Endpoint ' . $this->endpoint . ' returned no id on insert');
+                throw new MailtankException('Endpoint ' . $this::ENDPOINT . ' returned no id on insert');
             }
 
             $this->setAttributes($data, false);
             $this->setIsNewRecord(false);
             $this->afterSave();
+            return true;
         }
         return false;
     }
@@ -161,8 +167,13 @@ abstract class MailtankRecord extends \CModel
             $data = Yii::app()->mailtank->sendRequest(
                 $this->url,
                 json_encode($fields),
-                'post'
+                'put'
             );
+
+            if(!empty($data['message'])) {
+                var_dump($data['message']);
+                return false;
+            }
 
             $this->setAttributes($data, false);
             $this->afterSave();
@@ -178,7 +189,7 @@ abstract class MailtankRecord extends \CModel
      */
     public function beforeSave()
     {
-        if (!$this->createOnly && !$this->getIsNewRecord()) {
+        if ($this->createOnly && !$this->getIsNewRecord()) {
             throw new MailtankException('This mailtank model supports only insert method.');
         }
         return true;
@@ -212,5 +223,11 @@ abstract class MailtankRecord extends \CModel
         return $this->isNewRecord;
     }
 
-
+    /**
+     * @throws MailtankException
+     * @return bool
+     */
+    public function delete() {
+        throw new MailtankException('Method is not implemented yet.');
+    }
 }
