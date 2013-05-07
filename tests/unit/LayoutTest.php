@@ -96,4 +96,11 @@ class LayoutTest extends Mailtank_TestCase
 
         $this->fail('Layout cant be refreshed');
     }
+
+    public function testExternalIdValidate() {
+        $model = self::createBasicModel();
+        $model->external_id = 'invalid';
+        $this->assertFalse($model->save());
+        $this->assertNotEmpty($model->getError('external_id'));
+    }
 }

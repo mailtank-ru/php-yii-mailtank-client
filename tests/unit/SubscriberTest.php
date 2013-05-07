@@ -168,4 +168,11 @@ class SubscriberTest extends Mailtank_TestCase
             $this->assertContains($tag, $subscriber->tags);
         }
     }
+
+    public function testExternalIdValidate() {
+        $model = self::createBasicModel();
+        $model->external_id = 'invalid';
+        $this->assertFalse($model->save());
+        $this->assertNotEmpty($model->getError('external_id'));
+    }
 }

@@ -251,4 +251,10 @@ abstract class MailtankRecord extends \CModel
         );
         return true;
     }
+
+    public function validateExternalId($attribute, $params) {
+        if(mb_substr($this->$attribute,0,2) !== 'id') {
+            $this->addError($attribute, "External id must start with 'id' prefix");
+        }
+    }
 }

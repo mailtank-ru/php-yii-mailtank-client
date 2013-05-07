@@ -24,7 +24,7 @@ class MailtankLayout extends MailtankRecord
             array('markup', 'safe'),
             array('name', 'length', 'max' => 60),
             array('name, markup', 'required'),
-            array('external_id', 'safe'),
+            array('external_id', 'validateExternalId'),
             array('id', 'safe'),
         );
     }
