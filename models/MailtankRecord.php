@@ -70,14 +70,21 @@ abstract class MailtankRecord extends \CModel
             throw new MailtankException('This mailtank model supports only insert method.');
         }
 
-        $data = Yii::app()->mailtank->sendRequest(
-            $model::ENDPOINT . $pk,
-            null,
-            'get'
-        );
+        try {
+            $data = Yii::app()->mailtank->sendRequest(
+                $model::ENDPOINT . $pk,
+                null,
+                'get'
+            );
+        } catch (MailtankException $e) {
+            if ($e->getCode() == 404) {
+                return false;
+            }
+            throw $e;
+        }
 
         if ($data) {
-            if(!empty($data['message'])) {
+            if (!empty($data['message'])) {
                 return false;
             }
             $model->setAttributes($data, false);
@@ -92,7 +99,8 @@ abstract class MailtankRecord extends \CModel
      * @return MailtankRecord[]
      * @throws MailtankException
      */
-    public static function findAll($page) {
+    public static function findAll($page)
+    {
         $model = new get_class(self);
 
         if ($model->createOnly) {
@@ -106,8 +114,8 @@ abstract class MailtankRecord extends \CModel
         );
 
         $models = array();
-        if($data['objects']) {
-            foreach($data['objects'] as $attributes) {
+        if ($data['objects']) {
+            foreach ($data['objects'] as $attributes) {
                 $_model = clone $model;
                 $_model->setAttributes($attributes, false);
                 $models[] = $_model;
@@ -170,7 +178,7 @@ abstract class MailtankRecord extends \CModel
                 'put'
             );
 
-            if(!empty($data['message'])) {
+            if (!empty($data['message'])) {
                 var_dump($data['message']);
                 return false;
             }
@@ -203,7 +211,8 @@ abstract class MailtankRecord extends \CModel
 
     }
 
-    public function beforeSendAttributes($fields) {
+    public function beforeSendAttributes($fields)
+    {
         return $fields;
     }
 
@@ -227,7 +236,17 @@ abstract class MailtankRecord extends \CModel
      * @throws MailtankException
      * @return bool
      */
-    public function delete() {
-        throw new MailtankException('Method is not implemented yet.');
+    public function delete()
+    {
+        if ($this->createOnly || $this->getIsNewRecord()) {
+            throw new MailtankException('This mailtank model doesnt support delete method.');
+        }
+
+        $data = Yii::app()->mailtank->sendRequest(
+            $this->url,
+            null,
+            'delete'
+        );
+        return true;
     }
 }

@@ -43,7 +43,8 @@ class LayoutTest extends Mailtank_TestCase
         $this->fail('Layout cant be retrieved by id');
     }
 
-    public function testGetByExternalId() {
+    public function testGetByExternalId()
+    {
         $savedModel = $this->createBasicModel();
         $this->assertTrue($savedModel->save());
 
@@ -55,7 +56,8 @@ class LayoutTest extends Mailtank_TestCase
         $this->fail('Layout cant be retrieved by external id');
     }
 
-    public function testUpdate() {
+    public function testUpdate()
+    {
         $layout = $this->createBasicModel();
         $this->assertTrue($layout->save());
 
@@ -67,11 +69,17 @@ class LayoutTest extends Mailtank_TestCase
         $this->fail('Layout cant be saved');
     }
 
-    public function testDelete() {
+    public function testDelete()
+    {
         $model = $this->createBasicModel();
         $this->assertTrue($model->save());
 
-        $this->assertTrue($model->delete());
-        $this->assertFalse($model::findByPk($model->id));
+        try {
+            $model->delete();
+        } catch (MailtankException $e) {
+            return true;
+        }
+
+        $this->fail('Layout cant be deleted');
     }
 }

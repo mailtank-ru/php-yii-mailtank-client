@@ -1,9 +1,6 @@
 <?php
 Yii::setPathOfAlias('mailtank', __DIR__);
 
-use \m8rge\CurlHelper;
-use \m8rge\CurlException;
-
 class MailtankClient extends \CApplicationComponent
 {
     public $host;
@@ -15,38 +12,52 @@ class MailtankClient extends \CApplicationComponent
     public function init()
     {
         $this->headers = array(
-            CURLOPT_HTTPHEADER => array(
-                'X-Auth-Token: ' . $this->token,
-                'Content-Type: ' . 'application/json',
-            )
+            'X-Auth-Token' => $this->token,
+            'Content-Type' => 'application/json',
         );
     }
 
     public function sendRequest($endPoint, $fields = array(), $method = 'get')
     {
-        $e = null;
-        var_dump('Endpoint: ' . 'http://' . $this->host . $endPoint  );
-        try {
-            if ($method == 'get') {
-                $returnedData = CurlHelper::getUrl(
+        spl_autoload_unregister(array('YiiBase', 'autoload'));
+        require_once 'requests/library/Requests.php';
+        Requests::register_autoloader();
+
+        switch ($method) {
+            case 'get':
+                $response = Requests::get(
                     'http://' . $this->host . $endPoint . (!empty($fields) ? '?' . http_build_query($fields) : ''),
                     $this->headers
                 );
-            } else {
-                $returnedData = CurlHelper::postUrl('http://' . $this->host . $endPoint, $fields, $this->headers);
-            }
-        } catch (CurlException $e) {
-            $returnedData = $e->getData();
-            if (empty($returnedData)) {
-                throw $e;
-            }
-        }
-        $answer = json_decode($returnedData, true);
-        if (is_null($answer)) {
-            throw new MailtankException('answer from mailtank can\'t be decoded: ' . $returnedData, 0, $e);
+                $returnedData = json_decode($response->body, true);
+                break;
+            case 'delete':
+                $response = Requests::delete('http://' . $this->host . $endPoint, $this->headers);
+                $returnedData = $response->body;
+                break;
+            default:
+                $response = Requests::$method('http://' . $this->host . $endPoint, $this->headers, $fields);
+                $returnedData = json_decode($response->body, true);
+                break;
         }
 
-        return $answer;
+        spl_autoload_unregister(array('Requests', 'autoloader'));
+        spl_autoload_register(array('YiiBase', 'autoload'));
+
+        if (!$response->success) {
+            $message = @json_decode($response->body);
+            if (!empty($message->message)) {
+                $message = $message->message;
+            }
+            throw new MailtankException("Request failed at url: $method {$response->url}. " . $message, $response->status_code);
+        }
+
+        if (is_null($returnedData)) {
+            throw new MailtankException('answer from mailtank can\'t be decoded: ' . $response->body);
+        }
+
+
+        return $returnedData;
     }
 
 }

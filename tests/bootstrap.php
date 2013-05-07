@@ -1,7 +1,4 @@
 <?php
-require __DIR__ . "/../../../../vendor/autoload.php";
-
-
 // change the following paths if necessary
 $yiit = dirname(__FILE__) . '/../../../../lib/yii/framework/yiit.php';
 

@@ -15,7 +15,7 @@ class SubscriberTest extends Mailtank_TestCase
     }
 
 
-    public function testAdd()
+    public function testCreate()
     {
         $subscriber = $this->createBasicModel();
 
@@ -89,9 +89,6 @@ class SubscriberTest extends Mailtank_TestCase
         $newExternalId = 'id' . uniqid();
         $newEmail = $newExternalId . '@example.com';
 
-        var_dump($model->external_id);
-        var_dump($newExternalId);
-
         $model->setProperty('property2', 2);
         $model->setProperty('property4', 4);
         $model->tags = array('test2', 'test3');
@@ -128,8 +125,10 @@ class SubscriberTest extends Mailtank_TestCase
     }
 
     public function testDelete() {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $model = $this->createBasicModel();
+        $this->assertTrue($model->save());
+
+        $this->assertTrue($model->delete());
+        $this->assertFalse(MailtankSubscriber::findByPk($model->id));
     }
 }
