@@ -94,37 +94,6 @@ abstract class MailtankRecord extends \CModel
         return false;
     }
 
-    /**
-     * @param int $page
-     * @return MailtankRecord[]
-     * @throws MailtankException
-     */
-    public static function findAll($page)
-    {
-        $model = new get_class(self);
-
-        if ($model->createOnly) {
-            throw new MailtankException('This mailtank model supports only insert method.');
-        }
-
-        $data = Yii::app()->mailtank->sendRequest(
-            self::getEndpoint() . ($page ? "?page=$page" : ''),
-            null,
-            'get'
-        );
-
-        $models = array();
-        if ($data['objects']) {
-            foreach ($data['objects'] as $attributes) {
-                $_model = clone $model;
-                $_model->setAttributes($attributes, false);
-                $models[] = $_model;
-            }
-        }
-
-        return $models;
-    }
-
     public function save($runValidation = true, $attributes = null)
     {
         if (!$runValidation || $this->validate($attributes))
@@ -179,7 +148,6 @@ abstract class MailtankRecord extends \CModel
             );
 
             if (!empty($data['message'])) {
-                var_dump($data['message']);
                 return false;
             }
 
@@ -188,6 +156,40 @@ abstract class MailtankRecord extends \CModel
             return true;
         } else
             return false;
+    }
+
+    public function refresh()
+    {
+        if ($this->createOnly) {
+            throw new MailtankException('This mailtank model supports only refresh method.');
+        }
+
+        if (empty($this->url) || $this->getIsNewRecord()) {
+            throw new MailtankException('This model is new and cant be refreshed.');
+        }
+
+        try {
+            $data = Yii::app()->mailtank->sendRequest(
+                $this->url,
+                null,
+                'get'
+            );
+        } catch (MailtankException $e) {
+            if ($e->getCode() == 404) {
+                return false;
+            }
+            throw $e;
+        }
+
+        if ($data) {
+            if (!empty($data['message'])) {
+                return false;
+            }
+            $this->setAttributes($data, false);
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -242,7 +244,7 @@ abstract class MailtankRecord extends \CModel
             throw new MailtankException('This mailtank model doesnt support delete method.');
         }
 
-        $data = Yii::app()->mailtank->sendRequest(
+        Yii::app()->mailtank->sendRequest(
             $this->url,
             null,
             'delete'

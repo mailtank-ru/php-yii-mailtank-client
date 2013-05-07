@@ -84,10 +84,9 @@ class MailtankSubscriber extends MailtankRecord
 
     /**
      * Reassigns tag to specified subscribers
-     * Todo: validate input
-     * Todo: update patch
      * @param int[] $ids
      * @param string $tag
+     * @return bool
      */
     public static function patchTags($ids, $tag)
     {
@@ -99,9 +98,11 @@ class MailtankSubscriber extends MailtankRecord
             )
         );
         Yii::app()->mailtank->sendRequest(
-            self::getEndpoint(),
+            self::ENDPOINT,
             json_encode($fields),
-            'PATCH'
+            'patch'
         );
+
+        return true;
     }
 }

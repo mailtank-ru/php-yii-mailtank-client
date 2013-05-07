@@ -8,22 +8,16 @@ class MailtankMailing extends MailtankRecord
     const ENDPOINT = '/mailings/';
 
     public $markup;
-    public $name;
+    public $title;
     public $status;
+    public $layout_id;
+    public $context;
+    public $tags;
+    public $subscribers;
 
     protected $target;
 
     protected $createOnly = false;
-
-    public static function listStatuses()
-    {
-        return array(
-            0 => 'NOT_ENQUEUED',
-            1 => 'ENQUEUED',
-            2 => 'FAILED',
-            3 => 'SUCCEEDED'
-        );
-    }
 
     public static function model($className = __CLASS__)
     {
@@ -35,7 +29,7 @@ class MailtankMailing extends MailtankRecord
         return array(
             array('title', 'length', 'max' => 60),
             array('id', 'safe'),
-            array('layout_id', 'safe'),
+            array('layout_id, context', 'safe'),
             array('tags, subscribers', 'safe'),
         );
     }
@@ -49,10 +43,13 @@ class MailtankMailing extends MailtankRecord
     {
         return array_merge_recursive(parent::attributeNames(), array(
             'markup',
-            'name',
+            'title',
             'status',
             'tags',
-            'subscribers'
+            'url',
+            'subscribers',
+            'layout_id',
+            'context'
         ));
     }
 

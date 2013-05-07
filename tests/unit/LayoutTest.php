@@ -1,7 +1,7 @@
 <?php
 class LayoutTest extends Mailtank_TestCase
 {
-    protected function createBasicModel()
+    public static function createBasicModel()
     {
         $model = new MailtankLayout();
         $external_id = 'id' . uniqid();
@@ -17,7 +17,7 @@ class LayoutTest extends Mailtank_TestCase
     public function testCreate()
     {
 
-        $layout = $this->createBasicModel();
+        $layout = self::createBasicModel();
         $unsavedModel = clone $layout;
 
         $this->assertTrue($layout->save());
@@ -32,7 +32,7 @@ class LayoutTest extends Mailtank_TestCase
 
     public function testGetById()
     {
-        $savedModel = $this->createBasicModel();
+        $savedModel = self::createBasicModel();
         $this->assertTrue($savedModel->save());
 
         try {
@@ -45,7 +45,7 @@ class LayoutTest extends Mailtank_TestCase
 
     public function testGetByExternalId()
     {
-        $savedModel = $this->createBasicModel();
+        $savedModel = self::createBasicModel();
         $this->assertTrue($savedModel->save());
 
         try {
@@ -58,7 +58,7 @@ class LayoutTest extends Mailtank_TestCase
 
     public function testUpdate()
     {
-        $layout = $this->createBasicModel();
+        $layout = self::createBasicModel();
         $this->assertTrue($layout->save());
 
         try {
@@ -71,7 +71,7 @@ class LayoutTest extends Mailtank_TestCase
 
     public function testDelete()
     {
-        $model = $this->createBasicModel();
+        $model = self::createBasicModel();
         $this->assertTrue($model->save());
 
         try {
@@ -81,5 +81,19 @@ class LayoutTest extends Mailtank_TestCase
         }
 
         $this->fail('Layout cant be deleted');
+    }
+
+    public function testRefresh()
+    {
+        $savedModel = $this->createBasicModel();
+        $this->assertTrue($savedModel->save());
+
+        try {
+            $savedModel->refresh();
+        } catch (MailtankException $e) {
+            return;
+        }
+
+        $this->fail('Layout cant be refreshed');
     }
 }

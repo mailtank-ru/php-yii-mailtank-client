@@ -35,6 +35,10 @@ class MailtankClient extends \CApplicationComponent
                 $response = Requests::delete('http://' . $this->host . $endPoint, $this->headers);
                 $returnedData = $response->body;
                 break;
+            case 'patch':
+                $response = Requests::patch('http://' . $this->host . $endPoint, $this->headers, $fields);
+                $returnedData = $response->body;
+                break;
             default:
                 $response = Requests::$method('http://' . $this->host . $endPoint, $this->headers, $fields);
                 $returnedData = json_decode($response->body, true);
@@ -45,11 +49,8 @@ class MailtankClient extends \CApplicationComponent
         spl_autoload_register(array('YiiBase', 'autoload'));
 
         if (!$response->success) {
-            $message = @json_decode($response->body);
-            if (!empty($message->message)) {
-                $message = $message->message;
-            }
-            throw new MailtankException("Request failed at url: $method {$response->url}. " . $message, $response->status_code);
+            $message = @json_decode($response->body, true);
+            throw new MailtankException("Request failed at url: $method {$response->url}. " . print_r($message, true), $response->status_code);
         }
 
         if (is_null($returnedData)) {
