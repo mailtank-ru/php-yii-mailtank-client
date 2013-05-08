@@ -50,20 +50,27 @@ class MailtankClient extends \CApplicationComponent
 
         if (!$response->success) {
             $message = @json_decode($response->body, true);
-            throw new MailtankException("Request failed at url: $method {$response->url}. " . print_r($message, true), $response->status_code);
+            throw new MailtankException("Request failed at url: $method {$response->url}. " . print_r($message, true), $response->status_code, $message);
         }
 
         if (is_null($returnedData)) {
             throw new MailtankException('answer from mailtank can\'t be decoded: ' . $response->body);
         }
 
-
+        unset($response);
         return $returnedData;
     }
-
 }
 
 class MailtankException extends \Exception
 {
+    public $validationErrors = array();
 
+    public function __construct($message = "", $code = 0, $validationErrors = array(), Exception $previous = null)
+    {
+        if (is_array($validationErrors) && $code == 400) {
+            $this->validationErrors = $validationErrors;
+        }
+        parent::__construct($message, $code, $previous);
+    }
 }

@@ -111,11 +111,20 @@ abstract class MailtankRecord extends \CModel
             $fields = $this->getAttributes($attributes);
             $fields = $this->beforeSendAttributes($fields);
             unset($fields['id']);
-            $data = Yii::app()->mailtank->sendRequest(
-                $this::ENDPOINT,
-                json_encode($fields),
-                'post'
-            );
+            try {
+                $data = Yii::app()->mailtank->sendRequest(
+                    $this::ENDPOINT,
+                    json_encode($fields),
+                    'post'
+                );
+            } catch (MailtankException $e) {
+                if ($e->validationErrors) {
+                    $this->addErrors($e->validationErrors);
+                    return false;
+                } else {
+                    throw $e;
+                }
+            }
             if (empty($data['id'])) {
                 throw new MailtankException('Endpoint ' . $this::ENDPOINT . ' returned no id on insert');
             }
@@ -141,11 +150,20 @@ abstract class MailtankRecord extends \CModel
         if ($this->beforeSave()) {
             $fields = $this->getAttributes($attributes);
             $fields = $this->beforeSendAttributes($fields);
-            $data = Yii::app()->mailtank->sendRequest(
-                $this->url,
-                json_encode($fields),
-                'put'
-            );
+            try {
+                $data = Yii::app()->mailtank->sendRequest(
+                    $this->url,
+                    json_encode($fields),
+                    'put'
+                );
+            } catch (MailtankException $e) {
+                if ($e->validationErrors) {
+                    $this->addErrors($e->validationErrors);
+                    return false;
+                } else {
+                    throw $e;
+                }
+            }
 
             if (!empty($data['message'])) {
                 return false;
@@ -252,8 +270,9 @@ abstract class MailtankRecord extends \CModel
         return true;
     }
 
-    public function validateExternalId($attribute, $params) {
-        if(mb_substr($this->$attribute,0,2) !== 'id') {
+    public function validateExternalId($attribute, $params)
+    {
+        if (mb_substr($this->$attribute, 0, 2) !== 'id') {
             $this->addError($attribute, "External id must start with 'id' prefix");
         }
     }
