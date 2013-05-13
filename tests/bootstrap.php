@@ -1,15 +1,11 @@
 <?php
-// change the following paths if necessary
-$yiit = dirname(__FILE__) . '/../../../../lib/yii/framework/yiit.php';
+
+$yiit = __DIR__ . '/../vendor/yiisoft/yii/framework/yiit.php';
 
 require($yiit);
-$config = include dirname(__FILE__) . '/../../../config/test.php';
-$params = include dirname(__FILE__) . '/params.php';
-$config['components']['mailtank']['host'] = $params['host'];
-$config['components']['mailtank']['token'] = $params['token'];
+$params = include __DIR__ . '/params.php';
+$config = include __DIR__ . '/config.php';
 
-define('TEST_DIR', __DIR__);
-
-Yii::createWebApplication($config);
+Yii::createConsoleApplication($config);
 
 require_once(__DIR__ . '/Mailtank_TestCase.php');
