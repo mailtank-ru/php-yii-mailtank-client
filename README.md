@@ -23,7 +23,7 @@ main.php
 $subscriber = new MailtankSubscriber();
 $subscriber->email = 'first@example.com';
 // При обращении к api возможно использование как id, так и external_id
-$subscriber->external_id = 'id' . $myInternalId;
+$subscriber->external_id = $myInternalId;
 $subscriber->save();
 
 $subscriber2 = new MailtankSubscriber();
