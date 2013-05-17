@@ -7,6 +7,7 @@ class MailtankMailing extends MailtankRecord
 
     const ENDPOINT = '/mailings/';
 
+    public $url;
     public $title;
     public $status;
     public $layout_id;
@@ -30,6 +31,7 @@ class MailtankMailing extends MailtankRecord
             array('id', 'safe'),
             array('layout_id, context', 'safe'),
             array('tags, subscribers', 'safe'),
+            array('title, layout_id, context', 'required'),
         );
     }
 
@@ -44,6 +46,7 @@ class MailtankMailing extends MailtankRecord
             'title',
             'status',
             'tags',
+            'url',
             'subscribers',
             'layout_id',
             'context'
