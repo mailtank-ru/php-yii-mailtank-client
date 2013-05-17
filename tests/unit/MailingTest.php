@@ -28,10 +28,8 @@ class MailingTest extends Mailtank_TestCase
             'title' => 'test',
             'layout_id' => $layout->id,
             'context' => array('some_var' => 'some value'),
-            'target' => array(
-                'tags' => $tags,
-                'subscribers' => $subscribers,
-            ),
+            'tags' => $tags,
+            'subscribers' => $subscribers,
         ));
 
         return $model;
