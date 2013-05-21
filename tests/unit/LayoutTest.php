@@ -4,7 +4,7 @@ class LayoutTest extends Mailtank_TestCase
     public static function createBasicModel()
     {
         $model = new MailtankLayout();
-        $external_id = 'id' . uniqid();
+        $external_id = uniqid();
         $model->setAttributes(array(
             'external_id' => $external_id,
             'name' => 'test',
@@ -49,7 +49,7 @@ class LayoutTest extends Mailtank_TestCase
         $this->assertTrue($savedModel->save());
 
         try {
-            MailtankLayout::findByPk($savedModel->external_id);
+            MailtankLayout::findByExternalPk($savedModel->external_id);
         } catch (MailtankException $e) {
             return;
         }
@@ -95,12 +95,5 @@ class LayoutTest extends Mailtank_TestCase
         }
 
         $this->fail('Layout cant be refreshed');
-    }
-
-    public function testExternalIdValidate() {
-        $model = self::createBasicModel();
-        $model->external_id = 'invalid';
-        $this->assertFalse($model->save());
-        $this->assertNotEmpty($model->getError('external_id'));
     }
 }

@@ -6,8 +6,9 @@ class MailtankLayout extends MailtankRecord
 {
     const ENDPOINT = '/layouts/';
 
-    public $markup;
     public $name;
+    public $markup;
+    public $plaintext_markup;
     public $external_id;
 
     protected $createOnly = true;
@@ -24,8 +25,7 @@ class MailtankLayout extends MailtankRecord
             array('markup', 'safe'),
             array('name', 'length', 'max' => 60),
             array('name, markup', 'required'),
-            array('external_id', 'validateExternalId'),
-            array('id', 'safe'),
+            array('id, external_id, plaintext_markup', 'safe'),
         );
     }
 
@@ -38,6 +38,7 @@ class MailtankLayout extends MailtankRecord
         return array_merge_recursive(parent::attributeNames(), array(
             'markup',
             'name',
+            'plaintext_markup',
             'external_id',
         ));
     }

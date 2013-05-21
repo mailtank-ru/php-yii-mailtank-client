@@ -5,7 +5,7 @@ class SubscriberTest extends Mailtank_TestCase
     public static function createBasicModel()
     {
         $model = new MailtankSubscriber();
-        $external_id = 'id' . uniqid();
+        $external_id = uniqid();
         $model->setAttributes(array(
             'external_id' => $external_id,
             'email' => $external_id . "@example.com",
@@ -68,7 +68,7 @@ class SubscriberTest extends Mailtank_TestCase
         $savedModel = self::createBasicModel();
         $this->assertTrue($savedModel->save());
 
-        $subscriber = MailtankSubscriber::findByPk($savedModel->external_id);
+        $subscriber = MailtankSubscriber::findByExternalPk($savedModel->external_id);
         $this->assertEquals($savedModel->attributes, $subscriber->attributes);
     }
 
@@ -87,7 +87,7 @@ class SubscriberTest extends Mailtank_TestCase
 
         $model = clone $savedModel;
 
-        $newExternalId = 'id' . uniqid();
+        $newExternalId = uniqid();
         $newEmail = $newExternalId . '@example.com';
 
         $model->setProperty('property2', 2);
@@ -100,7 +100,7 @@ class SubscriberTest extends Mailtank_TestCase
 
 
         /** @var $_model MailtankSubscriber */
-        foreach (array($model, $model::findByPk($newExternalId)) as $_model) {
+        foreach (array($model, $model::findByExternalPk($newExternalId)) as $_model) {
             $this->assertEquals($newExternalId, $_model->external_id);
             $this->assertEquals($newEmail, $_model->email);
 
@@ -167,12 +167,5 @@ class SubscriberTest extends Mailtank_TestCase
             $this->assertTrue($subscriber->refresh());
             $this->assertContains($tag, $subscriber->tags);
         }
-    }
-
-    public function testExternalIdValidate() {
-        $model = self::createBasicModel();
-        $model->external_id = 'invalid';
-        $this->assertFalse($model->save());
-        $this->assertNotEmpty($model->getError('external_id'));
     }
 }

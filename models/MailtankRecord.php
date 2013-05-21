@@ -94,6 +94,11 @@ abstract class MailtankRecord extends \CModel
         return false;
     }
 
+    public static function findByExternalPk($externalPk)
+    {
+        return self::findByPk('id' . $externalPk);
+    }
+
     public function save($runValidation = true, $attributes = null)
     {
         if (!$runValidation || $this->validate($attributes))
@@ -268,12 +273,5 @@ abstract class MailtankRecord extends \CModel
             'delete'
         );
         return true;
-    }
-
-    public function validateExternalId($attribute, $params)
-    {
-        if (mb_substr($this->$attribute, 0, 2) !== 'id') {
-            $this->addError($attribute, "External id must start with 'id' prefix");
-        }
     }
 }
