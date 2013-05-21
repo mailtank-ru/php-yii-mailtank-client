@@ -21,7 +21,7 @@ class MailtankClient extends \CApplicationComponent
     {
         spl_autoload_unregister(array('YiiBase', 'autoload'));
         require_once 'requests/library/Requests.php';
-        Requests::register_autoloader();
+        Yii::registerAutoloader(array('Requests', 'autoloader'));
 
         switch ($method) {
             case 'get':
@@ -45,7 +45,6 @@ class MailtankClient extends \CApplicationComponent
                 break;
         }
 
-        spl_autoload_unregister(array('Requests', 'autoloader'));
         spl_autoload_register(array('YiiBase', 'autoload'));
 
         if (!$response->success) {
@@ -62,7 +61,7 @@ class MailtankClient extends \CApplicationComponent
     }
 }
 
-class MailtankException extends \Exception
+class MailtankException extends CException
 {
     public $validationErrors = array();
 
