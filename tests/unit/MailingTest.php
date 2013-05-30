@@ -11,17 +11,16 @@ class MailingTest extends Mailtank_TestCase
         for ($i = 2; $i > 0; $i--) {
             $subscriber = SubscriberTest::createBasicModel();
             $subscriber->save();
-            $subscribers[] = $subscriber;
+            $subscribers[] = $subscriber->id;
         }
 
         $tags = array('test_tag_' . uniqid());
         $subscriber = SubscriberTest::createBasicModel();
         $subscriber->tags = $tags;
-        $subscriber->save();
 
         $layout = LayoutTest::createBasicModel();
         $layout->markup = '{{some_var}}';
-        $layout->save();
+        self::assertTrue($layout->save(), 'Layout cant be saved');
 
         $model = new MailtankMailing();
         $model->setAttributes(array(
@@ -41,7 +40,7 @@ class MailingTest extends Mailtank_TestCase
         $model = self::createBasicModel();
         $this->assertTrue($model->save());
 
-        $this->assertContains($model->status, array('ENQUEUED', 'SUCCEEDED'));
+        $this->assertContains($model->status, array('ENQUEUED', 'SUCCEEDED', 'FAILED'));
     }
 
     public function testGetById()

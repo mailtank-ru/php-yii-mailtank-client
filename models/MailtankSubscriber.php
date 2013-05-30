@@ -14,7 +14,6 @@ class MailtankSubscriber extends MailtankRecord
 
     protected $properties = array();
 
-    public $external_id;
     public $email;
     public $tags = array();
 
@@ -29,7 +28,7 @@ class MailtankSubscriber extends MailtankRecord
             array('email', 'email'),
             array('email', 'length', 'max' => 255),
             array('email', 'required'),
-            array('external_id, tags, properties', 'safe'),
+            array('id, tags, properties', 'safe'),
         );
     }
 
@@ -77,7 +76,6 @@ class MailtankSubscriber extends MailtankRecord
             'tags',
             'url',
             'properties',
-            'external_id',
         ));
     }
 

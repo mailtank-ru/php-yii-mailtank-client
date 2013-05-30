@@ -4,9 +4,9 @@ class LayoutTest extends Mailtank_TestCase
     public static function createBasicModel()
     {
         $model = new MailtankLayout();
-        $external_id = uniqid();
+        $id = uniqid();
         $model->setAttributes(array(
-            'external_id' => $external_id,
+            'id' => $id,
             'name' => 'test',
             'markup' => 'Hello, {{username}}!',
         ));
@@ -22,12 +22,9 @@ class LayoutTest extends Mailtank_TestCase
 
         $this->assertTrue($layout->save());
 
-        $this->assertNotNull($layout->id, "Layout saved and got an id");
-        $this->assertEquals($unsavedModel->external_id, $layout->external_id);
+        $this->assertEquals($unsavedModel->id, $layout->id);
         $this->assertEquals('test', $layout->name);
         $this->assertEquals('Hello, {{username}}!', $layout->markup);
-
-        $this->id = $layout->id;
     }
 
     public function testGetById()
@@ -41,19 +38,6 @@ class LayoutTest extends Mailtank_TestCase
             return;
         }
         $this->fail('Layout cant be retrieved by id');
-    }
-
-    public function testGetByExternalId()
-    {
-        $savedModel = self::createBasicModel();
-        $this->assertTrue($savedModel->save());
-
-        try {
-            MailtankLayout::findByExternalPk($savedModel->external_id);
-        } catch (MailtankException $e) {
-            return;
-        }
-        $this->fail('Layout cant be retrieved by external id');
     }
 
     public function testUpdate()

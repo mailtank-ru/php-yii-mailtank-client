@@ -5,10 +5,10 @@ class SubscriberTest extends Mailtank_TestCase
     public static function createBasicModel()
     {
         $model = new MailtankSubscriber();
-        $external_id = uniqid();
+        $id = uniqid();
         $model->setAttributes(array(
-            'external_id' => $external_id,
-            'email' => $external_id . "@example.com",
+            'id' => $id,
+            'email' => $id . "@example.com",
         ));
 
         return $model;
@@ -31,7 +31,7 @@ class SubscriberTest extends Mailtank_TestCase
         $unsavedModel = clone $subscriber;
         $this->assertTrue($subscriber->save());
 
-        $this->assertEquals($subscriber->external_id, $unsavedModel->external_id);
+        $this->assertEquals($subscriber->id, $unsavedModel->id);
         $this->assertEquals($subscriber->email, $unsavedModel->email);
 
         $this->assertContains(
@@ -63,15 +63,6 @@ class SubscriberTest extends Mailtank_TestCase
         $this->assertEquals($savedModel->attributes, $subscriber->attributes);
     }
 
-    public function testGetByExternalId()
-    {
-        $savedModel = self::createBasicModel();
-        $this->assertTrue($savedModel->save());
-
-        $subscriber = MailtankSubscriber::findByExternalPk($savedModel->external_id);
-        $this->assertEquals($savedModel->attributes, $subscriber->attributes);
-    }
-
     public function testUpdate()
     {
         $savedModel = self::createBasicModel();
@@ -87,21 +78,18 @@ class SubscriberTest extends Mailtank_TestCase
 
         $model = clone $savedModel;
 
-        $newExternalId = uniqid();
-        $newEmail = $newExternalId . '@example.com';
+        $newEmail = uniqid() . '@example.com';
 
         $model->setProperty('property2', 2);
         $model->setProperty('property4', 4);
         $model->tags = array('test2', 'test3');
-        $model->external_id = $newExternalId;
         $model->email = $newEmail;
 
         $this->assertTrue($model->save());
 
-
         /** @var $_model MailtankSubscriber */
-        foreach (array($model, $model::findByExternalPk($newExternalId)) as $_model) {
-            $this->assertEquals($newExternalId, $_model->external_id);
+        foreach (array($model, $model::findByPk($model->id)) as $_model) {
+            $this->assertEquals($model->id, $_model->id);
             $this->assertEquals($newEmail, $_model->email);
 
             $this->assertContains(

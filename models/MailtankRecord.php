@@ -94,11 +94,6 @@ abstract class MailtankRecord extends \CModel
         return false;
     }
 
-    public static function findByExternalPk($externalPk)
-    {
-        return self::findByPk('id' . $externalPk);
-    }
-
     public function save($runValidation = true, $attributes = null)
     {
         if (!$runValidation || $this->validate($attributes))
@@ -115,7 +110,6 @@ abstract class MailtankRecord extends \CModel
         if ($this->beforeSave()) {
             $fields = $this->getAttributes($attributes);
             $fields = $this->beforeSendAttributes($fields);
-            unset($fields['id']);
             try {
                 $data = Yii::app()->mailtank->sendRequest(
                     $this::ENDPOINT,

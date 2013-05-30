@@ -9,7 +9,6 @@ class MailtankLayout extends MailtankRecord
     public $name;
     public $markup;
     public $plaintext_markup;
-    public $external_id;
 
     protected $createOnly = true;
 
@@ -25,7 +24,7 @@ class MailtankLayout extends MailtankRecord
             array('markup', 'safe'),
             array('name', 'length', 'max' => 60),
             array('name, markup', 'required'),
-            array('id, external_id, plaintext_markup', 'safe'),
+            array('id, plaintext_markup', 'safe'),
         );
     }
 
@@ -39,7 +38,6 @@ class MailtankLayout extends MailtankRecord
             'markup',
             'name',
             'plaintext_markup',
-            'external_id',
         ));
     }
 }
