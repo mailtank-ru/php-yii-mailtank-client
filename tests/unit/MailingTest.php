@@ -24,7 +24,6 @@ class MailingTest extends Mailtank_TestCase
 
         $model = new MailtankMailing();
         $model->setAttributes(array(
-            'title' => 'test',
             'layout_id' => $layout->id,
             'context' => array('some_var' => 'some value'),
             'tags' => $tags,

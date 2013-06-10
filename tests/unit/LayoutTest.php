@@ -9,6 +9,7 @@ class LayoutTest extends Mailtank_TestCase
             'id' => $id,
             'name' => 'test',
             'markup' => 'Hello, {{username}}!',
+            'subject_markup' => 'Hello, {{username}}!',
         ));
 
         return $model;
@@ -25,6 +26,7 @@ class LayoutTest extends Mailtank_TestCase
         $this->assertEquals($unsavedModel->id, $layout->id);
         $this->assertEquals('test', $layout->name);
         $this->assertEquals('Hello, {{username}}!', $layout->markup);
+        $this->assertEquals('Hello, {{username}}!', $layout->subject_markup);
     }
 
     public function testGetById()

@@ -34,7 +34,8 @@ $subscriber2->save();
 $layout = new MailtankLayout();
 $layout->setAttributes(
   array(
-    'external_id' => $my_prefered_id,
+    'id' => $my_prefered_id,
+    'subject_markup' => 'Hello from {{app_name}}',
     'name' => 'My awesome template',
     'markup' => 'Hello from {{app_name}}'
 ));
@@ -42,7 +43,6 @@ $layout->save();
 
 $mailing = new MailtankMailing();
 $mailing->setAttributes(array(
-    'title' => 'Hello!',
     'layout_id' => $layout->id,
     'context' => array('app_name' => Yii::app()->name),
     'target' => array(
