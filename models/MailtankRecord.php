@@ -88,6 +88,7 @@ abstract class MailtankRecord extends \CModel
                 return false;
             }
             $model->setAttributes($data, false);
+            $model->setIsNewRecord(false);
             return $model;
         }
 
