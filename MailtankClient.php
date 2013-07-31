@@ -25,9 +25,11 @@ class MailtankClient extends \CApplicationComponent
 
         $_tempFields = $fields;
         $fields = [];
-        foreach($_tempFields as $key => $value) {
-            if (!empty($value)) {
-                $fields[$key] = $value;
+        if ($_tempFields) {
+            foreach ($_tempFields as $key => $value) {
+                if (!empty($value)) {
+                    $fields[$key] = $value;
+                }
             }
         }
 
