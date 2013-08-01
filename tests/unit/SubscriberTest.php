@@ -156,4 +156,25 @@ class SubscriberTest extends Mailtank_TestCase
             $this->assertContains($tag, $subscriber->tags);
         }
     }
+
+    public function testPatchTagsAll()
+    {
+        $subscribers = array();
+        $subscribers_id = array();
+        for ($i = 0; $i < 2; $i++) {
+            $subscriber = $this->createBasicModel();
+            $this->assertTrue($subscriber->save());
+            $subscribers[] = $subscriber;
+            $subscribers_id[] = $subscriber->id;
+        }
+
+        $tag = 'test_tag_' . uniqid();
+        $result = MailtankSubscriber::patchTags('all', $tag);
+        $this->assertTrue($result);
+
+        foreach ($subscribers as $subscriber) {
+            $this->assertTrue($subscriber->refresh());
+            $this->assertContains($tag, $subscriber->tags);
+        }
+    }
 }

@@ -81,12 +81,13 @@ class MailtankSubscriber extends MailtankRecord
 
     /**
      * Reassigns tag to specified subscribers
-     * @param int[] $ids
+     * @param int[]|string $ids To assign tag ti all users set $ids === 'all'
      * @param string $tag
      * @return bool
      */
     public static function patchTags($ids, $tag)
     {
+        assert(is_array($ids) or $ids === 'all');
         $fields = array(
             'action' => 'reassign_tag',
             'data' => array(

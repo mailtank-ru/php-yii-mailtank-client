@@ -65,7 +65,7 @@ class MailtankMailing extends MailtankRecord
             $fields['target']['subscribers'] = $subscribers;
         }
 
-        return $fields;
+        return parent::beforeSendAttributes($fields);
     }
 
     public function beforeSave()

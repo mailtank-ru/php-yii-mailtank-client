@@ -23,16 +23,6 @@ class MailtankClient extends \CApplicationComponent
         require_once 'requests/library/Requests.php';
         Yii::registerAutoloader(array('Requests', 'autoloader'));
 
-        $_tempFields = $fields;
-        $fields = [];
-        if ($_tempFields) {
-            foreach ($_tempFields as $key => $value) {
-                if (!empty($value)) {
-                    $fields[$key] = $value;
-                }
-            }
-        }
-
         switch ($method) {
             case 'get':
                 $response = Requests::get(
