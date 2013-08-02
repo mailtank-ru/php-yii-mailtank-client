@@ -17,30 +17,31 @@ class MailtankClient extends \CApplicationComponent
         );
     }
 
-    public function sendRequest($endPoint, $fields = array(), $method = 'get')
+    public function sendRequest($endPoint, $fields = array(), $method = 'get', $options = [])
     {
         spl_autoload_unregister(array('YiiBase', 'autoload'));
         require_once 'requests/library/Requests.php';
         Yii::registerAutoloader(array('Requests', 'autoloader'));
 
+        $options['timeout'] = 20;
         switch ($method) {
             case 'get':
                 $response = Requests::get(
                     'http://' . $this->host . $endPoint . (!empty($fields) ? '?' . http_build_query($fields) : ''),
-                    $this->headers
+                    $this->headers, $options
                 );
                 $returnedData = json_decode($response->body, true);
                 break;
             case 'delete':
-                $response = Requests::delete('http://' . $this->host . $endPoint, $this->headers);
+                $response = Requests::delete('http://' . $this->host . $endPoint, $this->headers, $options);
                 $returnedData = $response->body;
                 break;
             case 'patch':
-                $response = Requests::patch('http://' . $this->host . $endPoint, $this->headers, $fields);
+                $response = Requests::patch('http://' . $this->host . $endPoint, $this->headers, $fields, $options);
                 $returnedData = $response->body;
                 break;
             default:
-                $response = Requests::$method('http://' . $this->host . $endPoint, $this->headers, $fields);
+                $response = Requests::$method('http://' . $this->host . $endPoint, $this->headers, $fields, $options);
                 $returnedData = json_decode($response->body, true);
                 break;
         }
