@@ -5,6 +5,11 @@ class MailtankClient extends \CApplicationComponent
 {
     public $host;
     public $token;
+    /**
+     * CURL option
+     * @var int
+     */
+    public $timeout = 20;
 
     protected $headers = array();
 
@@ -17,13 +22,13 @@ class MailtankClient extends \CApplicationComponent
         );
     }
 
-    public function sendRequest($endPoint, $fields = array(), $method = 'get', $options = [])
+    public function sendRequest($endPoint, $fields = array(), $method = 'get', $options = array())
     {
         spl_autoload_unregister(array('YiiBase', 'autoload'));
         require_once 'requests/library/Requests.php';
         Yii::registerAutoloader(array('Requests', 'autoloader'));
 
-        $options['timeout'] = 20;
+        $options = array_merge_recursive(array('timeout' => $this->timeout), $options);
         switch ($method) {
             case 'get':
                 $response = Requests::get(

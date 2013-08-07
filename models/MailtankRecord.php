@@ -234,7 +234,7 @@ abstract class MailtankRecord extends \CModel
     public function beforeSendAttributes($fields)
     {
         $_tempFields = $fields;
-        $fields = [];
+        $fields = array();
         if ($_tempFields) {
             foreach ($_tempFields as $key => $value) {
                 if (!empty($value)) {
