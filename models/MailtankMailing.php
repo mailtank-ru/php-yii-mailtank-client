@@ -12,6 +12,10 @@ class MailtankMailing extends MailtankRecord
     public $layout_id;
     public $context;
     public $tags;
+    public $tags_union = false;
+    public $tags_and_receivers_union = false;
+    public $unsubscribe_tags;
+    public $unsubscribe_link;
     public $subscribers;
 
     protected $target;
@@ -30,7 +34,17 @@ class MailtankMailing extends MailtankRecord
             array('layout_id, context', 'safe'),
             array('tags, subscribers', 'safe'),
             array('layout_id, context', 'required'),
+            array('unsubscribe_link', 'url'),
+            array('unsubscribe_tags', 'unsubscribeTagValidator'),
+            array('tags_union, tags_and_receivers_union', 'type', 'type' => 'bool'),
         );
+    }
+
+    public function unsubscribeTagValidator($attribute, $params) {
+        if(empty($this->{$attribute}) && empty($this->unsubscribe_link)) {
+            $this->addError($attribute,
+                'Unsubscribe tags is required if no unsubscribe link specified');
+        }
     }
 
 
@@ -43,6 +57,9 @@ class MailtankMailing extends MailtankRecord
         return array_merge_recursive(parent::attributeNames(), array(
             'status',
             'tags',
+            'tags_union',
+            'tags_and_receivers_union',
+            'unsubscribe_tags',
             'url',
             'subscribers',
             'layout_id',
@@ -52,18 +69,21 @@ class MailtankMailing extends MailtankRecord
 
     public function beforeSendAttributes($fields)
     {
-        $tags = $fields['tags'];
-        $subscribers = $fields['subscribers'];
-
-        unset($fields['tags'], $fields['subscribers']);
-
-        if (!empty($tags)) {
-            $fields['target']['tags'] = $tags;
+        function move_param($param, & $fields)
+        {
+            if(empty($fields[$param])) {
+                return;
+            }
+            $fields['target'][$param] = $fields[$param];
+            unset($fields[$param]);
         }
 
-        if (!empty($subscribers)) {
-            $fields['target']['subscribers'] = $subscribers;
-        }
+        move_param('tags', $fields);
+        move_param('unsubscribe_tags', $fields);
+        move_param('unsubscribe_link', $fields);
+        move_param('subscribers', $fields);
+        move_param('tags_union', $fields);
+        move_param('tags_and_receivers_union', $fields);
 
         return parent::beforeSendAttributes($fields);
     }
