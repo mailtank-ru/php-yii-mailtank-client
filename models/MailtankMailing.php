@@ -36,12 +36,13 @@ class MailtankMailing extends MailtankRecord
             array('layout_id, context', 'required'),
             array('unsubscribe_link', 'url'),
             array('unsubscribe_tags', 'unsubscribeTagValidator'),
-            array('tags_union, tags_and_receivers_union', 'type', 'type' => 'bool'),
+            array('tags_union, tags_and_receivers_union', 'boolean'),
         );
     }
 
-    public function unsubscribeTagValidator($attribute, $params) {
-        if(empty($this->{$attribute}) && empty($this->unsubscribe_link)) {
+    public function unsubscribeTagValidator($attribute, $params)
+    {
+        if (empty($this->{$attribute}) && empty($this->unsubscribe_link)) {
             $this->addError($attribute,
                 'Unsubscribe tags is required if no unsubscribe link specified');
         }
@@ -67,23 +68,23 @@ class MailtankMailing extends MailtankRecord
         ));
     }
 
+    private static function move_param($param, & $fields)
+    {
+        if (empty($fields[$param])) {
+            return;
+        }
+        $fields['target'][$param] = $fields[$param];
+        unset($fields[$param]);
+    }
+
     public function beforeSendAttributes($fields)
     {
-        function move_param($param, & $fields)
-        {
-            if(empty($fields[$param])) {
-                return;
-            }
-            $fields['target'][$param] = $fields[$param];
-            unset($fields[$param]);
-        }
-
-        move_param('tags', $fields);
-        move_param('unsubscribe_tags', $fields);
-        move_param('unsubscribe_link', $fields);
-        move_param('subscribers', $fields);
-        move_param('tags_union', $fields);
-        move_param('tags_and_receivers_union', $fields);
+        self::move_param('tags', $fields);
+        self::move_param('unsubscribe_tags', $fields);
+        self::move_param('unsubscribe_link', $fields);
+        self::move_param('subscribers', $fields);
+        self::move_param('tags_union', $fields);
+        self::move_param('tags_and_receivers_union', $fields);
 
         return parent::beforeSendAttributes($fields);
     }

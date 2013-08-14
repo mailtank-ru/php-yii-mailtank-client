@@ -1,5 +1,6 @@
 <?php
 Yii::import('mailtank.models.*');
+Yii::import('mailtank.tests.unit.*');
 class MailingTest extends Mailtank_TestCase
 {
 
@@ -27,8 +28,11 @@ class MailingTest extends Mailtank_TestCase
             'layout_id' => $layout->id,
             'context' => array('some_var' => 'some value'),
             'tags' => $tags,
+            'unsubscribe_tags' => $tags,
             'subscribers' => $subscribers,
         ));
+
+        self::assertTrue($model->validate());
 
         return $model;
     }
