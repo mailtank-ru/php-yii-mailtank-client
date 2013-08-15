@@ -48,7 +48,7 @@ class MailtankSubscriber extends MailtankRecord
 
     public function setProperty($key, $value)
     {
-        if (is_string($key) && !empty($value)) {
+        if (is_string($key)) {
             $this->properties[$key] = $value;
         } else {
             throw new \Exception('Type error');
