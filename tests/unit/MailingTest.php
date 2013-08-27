@@ -8,19 +8,17 @@ class MailingTest extends Mailtank_TestCase
     {
         // Create subscribers and tags
         $subscribers = array();
+        $tags = array('test_tag_' . uniqid());
 
         for ($i = 2; $i > 0; $i--) {
             $subscriber = SubscriberTest::createBasicModel();
-            $subscriber->save();
+            $subscriber->tags = $tags;
+            self::assertTrue($subscriber->save());
             $subscribers[] = $subscriber->id;
         }
 
-        $tags = array('test_tag_' . uniqid());
-        $subscriber = SubscriberTest::createBasicModel();
-        $subscriber->tags = $tags;
-
         $layout = LayoutTest::createBasicModel();
-        $layout->markup = '{{some_var}}';
+        $layout->markup = '{{some_var}} {{unsubscribe_link}}';
         self::assertTrue($layout->save(), 'Layout cant be saved');
 
         $model = new MailtankMailing();
@@ -30,6 +28,9 @@ class MailingTest extends Mailtank_TestCase
             'tags' => $tags,
             'unsubscribe_tags' => $tags,
             'subscribers' => $subscribers,
+            'tags_union' => true,
+            'tags_and_receivers_union' => true,
+            'unsubscribe_tags' => $tags,
         ));
 
         self::assertTrue($model->validate());

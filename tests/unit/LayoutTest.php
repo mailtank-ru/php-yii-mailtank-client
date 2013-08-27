@@ -8,7 +8,7 @@ class LayoutTest extends Mailtank_TestCase
         $model->setAttributes(array(
             'id' => $id,
             'name' => 'test',
-            'markup' => 'Hello, {{username}}!',
+            'markup' => 'Hello, {{username}}! {{unsubscribe_link}}',
             'subject_markup' => 'Hello, {{username}}!',
         ));
 
@@ -25,7 +25,7 @@ class LayoutTest extends Mailtank_TestCase
 
         $this->assertEquals($unsavedModel->id, $layout->id);
         $this->assertEquals('test', $layout->name);
-        $this->assertEquals('Hello, {{username}}!', $layout->markup);
+        $this->assertEquals('Hello, {{username}}! {{unsubscribe_link}}', $layout->markup);
         $this->assertEquals('Hello, {{username}}!', $layout->subject_markup);
     }
 
