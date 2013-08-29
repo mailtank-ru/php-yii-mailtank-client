@@ -177,4 +177,14 @@ class SubscriberTest extends Mailtank_TestCase
             $this->assertContains($tag, $subscriber->tags);
         }
     }
+
+    public function testEmailAsId()
+    {
+        $subscriber = self::createBasicModel();
+        $subscriber->id = $subscriber->email;
+        $this->assertTrue($subscriber->save());
+        $this->assertTrue($subscriber->refresh());
+        $this->assertTrue($subscriber->delete());
+        $this->assertFalse($subscriber->refresh());
+    }
 }
