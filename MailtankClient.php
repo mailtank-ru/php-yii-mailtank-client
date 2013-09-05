@@ -9,7 +9,7 @@ class MailtankClient extends \CApplicationComponent
      * CURL option
      * @var int
      */
-    public $timeout = 20;
+    public $timeout = 0;
 
     protected $headers = array();
 
