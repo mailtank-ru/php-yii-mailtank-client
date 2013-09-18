@@ -237,7 +237,7 @@ abstract class MailtankRecord extends \CModel
         $fields = array();
         if ($_tempFields) {
             foreach ($_tempFields as $key => $value) {
-                if (!empty($value)) {
+                if ($value!==null) {
                     $fields[$key] = $value;
                 }
             }
