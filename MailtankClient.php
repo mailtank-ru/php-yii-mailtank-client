@@ -1,5 +1,4 @@
 <?php
-
 Yii::setPathOfAlias('mailtank', __DIR__);
 
 class MailtankClient extends \CApplicationComponent
