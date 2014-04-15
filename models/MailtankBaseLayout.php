@@ -1,15 +1,13 @@
 <?php
 /**
- * Class MailtankLayout
+ * Class MailtankBaseLayout
  */
-class MailtankLayout extends MailtankRecord
+class MailtankBaseLayout extends MailtankRecord
 {
-    const ENDPOINT = '/layouts/';
+    const ENDPOINT = '/base_layouts/';
 
     public $name;
     public $markup;
-    public $plaintext_markup;
-    public $subject_markup;
 
     public static function model($className = __CLASS__)
     {
@@ -21,8 +19,8 @@ class MailtankLayout extends MailtankRecord
         return array(
             array('markup', 'safe'),
             array('name', 'length', 'max' => 60),
-            array('name, markup, subject_markup', 'required'),
-            array('id, plaintext_markup', 'safe'),
+            array('name, markup', 'required'),
+            array('id', 'safe'),
         );
     }
 
@@ -35,8 +33,6 @@ class MailtankLayout extends MailtankRecord
         return array_merge_recursive(parent::attributeNames(), array(
             'markup',
             'name',
-            'plaintext_markup',
-            'subject_markup',
         ));
     }
 
@@ -44,6 +40,7 @@ class MailtankLayout extends MailtankRecord
     {
         $this->url = self::ENDPOINT.$this->id;
         $this->setIsNewRecord(false);
+        var_dump($this->url);
         return parent::delete();
     }
 }
