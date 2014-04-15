@@ -36,6 +36,9 @@ class MailtankBaseLayout extends MailtankRecord
         ));
     }
 
+    /**
+     * Delete base layout
+     */
     public function delete()
     {
         $this->url = self::ENDPOINT.$this->id;
