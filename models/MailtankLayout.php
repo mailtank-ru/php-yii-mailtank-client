@@ -10,6 +10,7 @@ class MailtankLayout extends MailtankRecord
     public $markup;
     public $plaintext_markup;
     public $subject_markup;
+    public $base;
 
     public static function model($className = __CLASS__)
     {
@@ -22,7 +23,7 @@ class MailtankLayout extends MailtankRecord
             array('markup', 'safe'),
             array('name', 'length', 'max' => 60),
             array('name, markup, subject_markup', 'required'),
-            array('id, plaintext_markup', 'safe'),
+            array('id, plaintext_markup, base', 'safe'),
         );
     }
 
@@ -37,6 +38,7 @@ class MailtankLayout extends MailtankRecord
             'name',
             'plaintext_markup',
             'subject_markup',
+            'base',
         ));
     }
 
