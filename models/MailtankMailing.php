@@ -17,6 +17,7 @@ class MailtankMailing extends MailtankRecord
     public $unsubscribe_tags;
     public $unsubscribe_link;
     public $subscribers;
+    public $attachments;
 
     protected $target;
 
@@ -32,7 +33,7 @@ class MailtankMailing extends MailtankRecord
         return array(
             array('id', 'safe'),
             array('layout_id, context', 'safe'),
-            array('tags, subscribers', 'safe'),
+            array('tags, subscribers, attachments', 'safe'),
             array('layout_id, context', 'required'),
             array('unsubscribe_link', 'url'),
             array('unsubscribe_tags', 'unsubscribeTagValidator'),
@@ -64,7 +65,8 @@ class MailtankMailing extends MailtankRecord
             'url',
             'subscribers',
             'layout_id',
-            'context'
+            'context',
+            'attachments'
         ));
     }
 
