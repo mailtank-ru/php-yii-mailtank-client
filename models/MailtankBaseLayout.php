@@ -9,6 +9,13 @@ class MailtankBaseLayout extends MailtankRecord
     public $name;
     public $markup;
 
+    protected $crud = array(
+        'insert' => true,
+        'find'   => false,
+        'update' => false,
+        'delete' => true
+    );
+
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
@@ -43,7 +50,6 @@ class MailtankBaseLayout extends MailtankRecord
     {
         $this->url = self::ENDPOINT.$this->id;
         $this->setIsNewRecord(false);
-        var_dump($this->url);
         return parent::delete();
     }
 }

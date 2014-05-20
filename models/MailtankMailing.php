@@ -20,8 +20,12 @@ class MailtankMailing extends MailtankRecord
     public $attachments;
 
     protected $target;
-
-    protected $createOnly = false;
+    protected $crud = array(
+        'insert' => true,
+        'find'   => true,
+        'update' => false,
+        'delete' => false
+    );
 
     public static function model($className = __CLASS__)
     {
@@ -98,6 +102,4 @@ class MailtankMailing extends MailtankRecord
         }
         return parent::beforeSave();
     }
-
-
 }

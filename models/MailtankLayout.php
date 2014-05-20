@@ -12,6 +12,13 @@ class MailtankLayout extends MailtankRecord
     public $subject_markup;
     public $base;
 
+    protected $crud = array(
+        'insert' => true,
+        'find'   => false,
+        'update' => false,
+        'delete' => true
+    );
+
     public static function model($className = __CLASS__)
     {
         return parent::model($className);

@@ -9,7 +9,6 @@
  */
 class MailtankSubscriber extends MailtankRecord
 {
-
     const ENDPOINT = '/subscribers/';
 
     protected $properties = array();
