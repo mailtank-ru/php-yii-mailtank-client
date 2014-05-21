@@ -12,8 +12,8 @@ abstract class MailtankRecord extends \CModel
     protected $url;
     protected $isNewRecord;
     protected $crud = array(
-        'insert' => true,
-        'find'   => true,
+        'create' => true,
+        'read'   => true,
         'update' => true,
         'delete' => true
     );
@@ -55,7 +55,7 @@ abstract class MailtankRecord extends \CModel
         $className = get_called_class();
         $model = new $className;
 
-        if (!$model->crud['find']) {
+        if (!$model->crud['read']) {
             throw new MailtankException('This mailtank model doent supports find method.');
         }
 
@@ -168,7 +168,7 @@ abstract class MailtankRecord extends \CModel
 
     public function refresh()
     {
-        if (!$this->crud['find']) {
+        if (!$this->crud['read']) {
             throw new MailtankException('This mailtank model doesnt supports refresh method.');
         }
 
@@ -207,7 +207,7 @@ abstract class MailtankRecord extends \CModel
      */
     public function beforeSave()
     {
-        if ($this->crud['insert'] || $this->crud['update'])
+        if ($this->crud['create'] || $this->crud['update'])
             return true;
         throw new MailtankException('This mailtank model supports only insert and update methods.');
     }

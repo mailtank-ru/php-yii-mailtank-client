@@ -10,8 +10,8 @@ class MailtankBaseLayout extends MailtankRecord
     public $markup;
 
     protected $crud = array(
-        'insert' => true,
-        'find'   => false,
+        'create' => true,
+        'read'   => false,
         'update' => false,
         'delete' => true
     );

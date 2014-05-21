@@ -21,8 +21,8 @@ class MailtankMailing extends MailtankRecord
 
     protected $target;
     protected $crud = array(
-        'insert' => true,
-        'find'   => true,
+        'create' => true,
+        'read'   => true,
         'update' => false,
         'delete' => false
     );
