@@ -11,7 +11,7 @@ class MailtankSubscriber extends MailtankRecord
 {
     const ENDPOINT = '/subscribers/';
 
-    protected $properties = array();
+    protected $properties = null;       // Necessarily NULL, that empty properties worked
 
     public $email;
     public $tags = array();

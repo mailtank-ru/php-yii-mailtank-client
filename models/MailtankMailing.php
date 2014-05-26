@@ -4,7 +4,6 @@
  */
 class MailtankMailing extends MailtankRecord
 {
-
     const ENDPOINT = '/mailings/';
 
     public $url;

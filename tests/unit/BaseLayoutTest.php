@@ -1,17 +1,16 @@
 <?php
-class LayoutTest extends Mailtank_TestCase
+class BaseLayoutTest extends Mailtank_TestCase
 {
     private static $layoutId = false;
 
     public static function createBasicModel()
     {
-        $model = new MailtankLayout();
+        $model = new MailtankBaseLayout();
         $id = uniqid();
         $model->setAttributes(array(
             'id' => $id,
-            'name' => 'test Layout '.$id,
+            'name' => 'test BaseLayoutTest '.$id,
             'markup' => 'Hello, {{username}}! {{unsubscribe_link}}',
-            'subject_markup' => 'Hello, {{username}}!',
         ));
 
         return $model;
@@ -20,7 +19,7 @@ class LayoutTest extends Mailtank_TestCase
     private function clearUnusedData()
     {
         if (self::$layoutId !== false) {
-            $layout = new MailtankLayout();
+            $layout = new MailtankBaseLayout();
             $layout->id = self::$layoutId;
             $this->assertTrue($layout->delete());
             self::$layoutId = false;
@@ -36,9 +35,8 @@ class LayoutTest extends Mailtank_TestCase
         self::$layoutId = $layout->id;
 
         $this->assertEquals($unsavedModel->id, $layout->id);
-        $this->assertEquals('test Layout '.$layout->id, $layout->name);
+        $this->assertEquals('test BaseLayoutTest '.$layout->id, $layout->name);
         $this->assertEquals('Hello, {{username}}! {{unsubscribe_link}}', $layout->markup);
-        $this->assertEquals('Hello, {{username}}!', $layout->subject_markup);
 
         $this->clearUnusedData();
     }
@@ -55,7 +53,7 @@ class LayoutTest extends Mailtank_TestCase
             $this->clearUnusedData();
             return;
         }
-        $this->fail('Layout cant be retrieved by id');
+        $this->fail('BaseLayout cant be retrieved by id');
         $this->clearUnusedData();
     }
 
@@ -71,7 +69,7 @@ class LayoutTest extends Mailtank_TestCase
             $this->clearUnusedData();
             return;
         }
-        $this->fail('Layout cant be saved');
+        $this->fail('BaseLayout cant be saved');
         $this->clearUnusedData();
     }
 
@@ -84,8 +82,8 @@ class LayoutTest extends Mailtank_TestCase
         try {
             $layout->delete();
         } catch (MailtankException $e) {
+            $this->fail('BaseLayout cant be deleted');
             $this->clearUnusedData();
-            $this->fail('Layout cant be deleted');
             return;
         }
         $this->clearUnusedData();
@@ -104,7 +102,7 @@ class LayoutTest extends Mailtank_TestCase
             return;
         }
 
-        $this->fail('Layout cant be refreshed');
+        $this->fail('BaseLayout cant be refreshed');
         $this->clearUnusedData();
     }
 }
