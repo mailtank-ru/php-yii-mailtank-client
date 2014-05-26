@@ -4,7 +4,6 @@
  */
 class MailtankMailing extends MailtankRecord
 {
-
     const ENDPOINT = '/mailings/';
 
     public $url;
@@ -17,10 +16,15 @@ class MailtankMailing extends MailtankRecord
     public $unsubscribe_tags;
     public $unsubscribe_link;
     public $subscribers;
+    public $attachments;
 
     protected $target;
-
-    protected $createOnly = false;
+    protected $crud = array(
+        'create' => true,
+        'read'   => true,
+        'update' => false,
+        'delete' => false
+    );
 
     public static function model($className = __CLASS__)
     {
@@ -32,7 +36,7 @@ class MailtankMailing extends MailtankRecord
         return array(
             array('id', 'safe'),
             array('layout_id, context', 'safe'),
-            array('tags, subscribers', 'safe'),
+            array('tags, subscribers, attachments', 'safe'),
             array('layout_id, context', 'required'),
             array('unsubscribe_link', 'url'),
             array('unsubscribe_tags', 'unsubscribeTagValidator'),
@@ -64,7 +68,8 @@ class MailtankMailing extends MailtankRecord
             'url',
             'subscribers',
             'layout_id',
-            'context'
+            'context',
+            'attachments'
         ));
     }
 
@@ -96,6 +101,4 @@ class MailtankMailing extends MailtankRecord
         }
         return parent::beforeSave();
     }
-
-
 }

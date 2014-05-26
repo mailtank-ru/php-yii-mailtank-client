@@ -1,6 +1,7 @@
 <?php
 class SubscriberTest extends Mailtank_TestCase
 {
+    private static $subscriberIds = array();
 
     public static function createBasicModel()
     {
@@ -14,13 +15,19 @@ class SubscriberTest extends Mailtank_TestCase
         return $model;
     }
 
+    private function clearUnusedData()
+    {
+        foreach (self::$subscriberIds as $subscriberId) {
+            $subscriber = MailtankSubscriber::model()->findByPk($subscriberId);
+            $this->assertTrue($subscriber->delete());
+        }
+        self::$subscriberIds = array();
+    }
 
     public function testCreate()
     {
         $subscriber = self::createBasicModel();
-
         $subscriber->tags = array('test1', 'test2');
-
         $subscriber->setProperties(array(
             'property1' => 1,
             'property2' => 0,
@@ -30,6 +37,7 @@ class SubscriberTest extends Mailtank_TestCase
 
         $unsavedModel = clone $subscriber;
         $this->assertTrue($subscriber->save());
+        self::$subscriberIds[] = $subscriber->id;
 
         $this->assertEquals($subscriber->id, $unsavedModel->id);
         $this->assertEquals($subscriber->email, $unsavedModel->email);
@@ -52,22 +60,24 @@ class SubscriberTest extends Mailtank_TestCase
         );
 
         $this->assertNotNull($subscriber->id);
+        $this->clearUnusedData();
     }
 
     public function testGetById()
     {
         $savedModel = self::createBasicModel();
         $this->assertTrue($savedModel->save());
+        self::$subscriberIds[] = $savedModel->id;
 
         $subscriber = MailtankSubscriber::findByPk($savedModel->id);
         $this->assertEquals($savedModel->attributes, $subscriber->attributes);
+        $this->clearUnusedData();
     }
 
     public function testUpdate()
     {
         $savedModel = self::createBasicModel();
         $savedModel->tags = array('test1', 'test2');
-
         $savedModel->setProperties(array(
             'property1' => 1,
             'property2' => 0,
@@ -75,6 +85,7 @@ class SubscriberTest extends Mailtank_TestCase
         ));
         $savedModel->setProperty('property2', 2);
         $this->assertTrue($savedModel->save());
+        self::$subscriberIds[] = $savedModel->id;
 
         $model = clone $savedModel;
 
@@ -110,20 +121,23 @@ class SubscriberTest extends Mailtank_TestCase
                 $_model->attributes
             );
         }
+        $this->clearUnusedData();
     }
 
     public function testDelete()
     {
         $model = self::createBasicModel();
         $this->assertTrue($model->save());
+        // dont need self::$subscriberIds[] = $model->id;
 
         $this->assertTrue($model->delete());
         $this->assertFalse(MailtankSubscriber::findByPk($model->id));
+        $this->clearUnusedData();
     }
 
     public function testRefresh()
     {
-        $savedModel = $this->createBasicModel();
+        $savedModel = self::createBasicModel();
 
         $e = false;
         try {
@@ -133,7 +147,9 @@ class SubscriberTest extends Mailtank_TestCase
         }
         $this->assertTrue($e, 'Updated model cant be refreshed');
         $this->assertTrue($savedModel->save());
+        self::$subscriberIds[] = $savedModel->id;
         $this->assertTrue($savedModel->refresh());
+        $this->clearUnusedData();
     }
 
     public function testPatchTags()
@@ -141,8 +157,9 @@ class SubscriberTest extends Mailtank_TestCase
         $subscribers = array();
         $subscribers_id = array();
         for ($i = 0; $i < 2; $i++) {
-            $subscriber = $this->createBasicModel();
+            $subscriber = self::createBasicModel();
             $this->assertTrue($subscriber->save());
+            self::$subscriberIds[] = $subscriber->id;
             $subscribers[] = $subscriber;
             $subscribers_id[] = $subscriber->id;
         }
@@ -155,17 +172,17 @@ class SubscriberTest extends Mailtank_TestCase
             $this->assertTrue($subscriber->refresh());
             $this->assertContains($tag, $subscriber->tags);
         }
+        $this->clearUnusedData();
     }
 
     public function testPatchTagsAll()
     {
         $subscribers = array();
-        $subscribers_id = array();
         for ($i = 0; $i < 2; $i++) {
-            $subscriber = $this->createBasicModel();
+            $subscriber = self::createBasicModel();
             $this->assertTrue($subscriber->save());
+            self::$subscriberIds[] = $subscriber->id;
             $subscribers[] = $subscriber;
-            $subscribers_id[] = $subscriber->id;
         }
 
         $tag = 'test_tag_' . uniqid();
@@ -176,6 +193,7 @@ class SubscriberTest extends Mailtank_TestCase
             $this->assertTrue($subscriber->refresh());
             $this->assertContains($tag, $subscriber->tags);
         }
+        $this->clearUnusedData();
     }
 
     public function testEmailAsId()

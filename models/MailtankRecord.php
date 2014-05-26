@@ -11,22 +11,14 @@ abstract class MailtankRecord extends \CModel
 
     protected $url;
     protected $isNewRecord;
+    protected $crud = array(
+        'create' => true,
+        'read'   => true,
+        'update' => true,
+        'delete' => true
+    );
 
     private static $_models = array();
-
-    /**
-     * Tells us if this api endpoint supports all of crud methods or only insert
-     * @var bool
-     */
-    protected $createOnly = false;
-
-    /**
-     * @return boolean
-     */
-    public function getCreateOnly()
-    {
-        return $this->createOnly;
-    }
 
 
     function __construct()
@@ -34,15 +26,12 @@ abstract class MailtankRecord extends \CModel
         $this->setIsNewRecord(true);
     }
 
-
     public static function model($className = __CLASS__)
     {
         if (isset(self::$_models[$className]))
             return self::$_models[$className];
-        else {
-            $model = self::$_models[$className] = new $className(null);
-            return $model;
-        }
+        $model = self::$_models[$className] = new $className(null);
+        return $model;
     }
 
     /**
@@ -66,8 +55,8 @@ abstract class MailtankRecord extends \CModel
         $className = get_called_class();
         $model = new $className;
 
-        if ($model->createOnly) {
-            throw new MailtankException('This mailtank model supports only insert method.');
+        if (!$model->crud['read']) {
+            throw new MailtankException('This mailtank model doent supports find method.');
         }
 
         try {
@@ -99,8 +88,7 @@ abstract class MailtankRecord extends \CModel
     {
         if (!$runValidation || $this->validate($attributes))
             return $this->getIsNewRecord() ? $this->insert($attributes) : $this->update($attributes);
-        else
-            return false;
+        return false;
     }
 
     public function insert($attributes = null)
@@ -108,33 +96,34 @@ abstract class MailtankRecord extends \CModel
         $this->scenario = 'insert';
         if (!$this->getIsNewRecord())
             throw new MailtankException('The mailtank record cannot be inserted to api because it is not new.');
-        if ($this->beforeSave()) {
-            $fields = $this->getAttributes($attributes);
-            $fields = $this->beforeSendAttributes($fields);
-            try {
-                $data = Yii::app()->mailtank->sendRequest(
-                    $this::ENDPOINT,
-                    json_encode($fields),
-                    'post'
-                );
-            } catch (MailtankException $e) {
-                if ($e->validationErrors) {
-                    $this->addErrors($e->validationErrors);
-                    return false;
-                } else {
-                    throw $e;
-                }
-            }
-            if (empty($data['id'])) {
-                throw new MailtankException('Endpoint ' . $this::ENDPOINT . ' returned no id on insert');
-            }
+        
+        if (!$this->beforeSave())
+            return false;
 
-            $this->setAttributes($data, false);
-            $this->setIsNewRecord(false);
-            $this->afterSave();
-            return true;
+        $fields = $this->getAttributes($attributes);
+        $fields = $this->beforeSendAttributes($fields);
+        try {
+            $data = Yii::app()->mailtank->sendRequest(
+                $this::ENDPOINT,
+                json_encode($fields),
+                'post'
+            );
+        } catch (MailtankException $e) {
+            if ($e->validationErrors) {
+                $this->addErrors($e->validationErrors);
+                return false;
+            } else {
+                throw $e;
+            }
         }
-        return false;
+        if (empty($data['id'])) {
+            throw new MailtankException('Endpoint ' . $this::ENDPOINT . ' returned no id on insert');
+        }
+
+        $this->setAttributes($data, false);
+        $this->setIsNewRecord(false);
+        $this->afterSave();
+        return true;
     }
 
     /**
@@ -147,39 +136,40 @@ abstract class MailtankRecord extends \CModel
         $this->scenario = 'update';
         if ($this->getIsNewRecord())
             throw new MailtankException(\Yii::t('yii', 'The active record cannot be updated because it is new.'));
-        if ($this->beforeSave()) {
-            $fields = $this->getAttributes($attributes);
-            $fields = $this->beforeSendAttributes($fields);
-            try {
-                $data = Yii::app()->mailtank->sendRequest(
-                    $this->url,
-                    json_encode($fields),
-                    'put'
-                );
-            } catch (MailtankException $e) {
-                if ($e->validationErrors) {
-                    $this->addErrors($e->validationErrors);
-                    return false;
-                } else {
-                    throw $e;
-                }
-            }
-
-            if (!empty($data['message'])) {
-                return false;
-            }
-
-            $this->setAttributes($data, false);
-            $this->afterSave();
-            return true;
-        } else
+        
+        if (!$this->beforeSave())
             return false;
+
+        $fields = $this->getAttributes($attributes);
+        $fields = $this->beforeSendAttributes($fields);
+        try {
+            $data = Yii::app()->mailtank->sendRequest(
+                $this->url,
+                json_encode($fields),
+                'put'
+            );
+        } catch (MailtankException $e) {
+            if ($e->validationErrors) {
+                $this->addErrors($e->validationErrors);
+                return false;
+            } else {
+                throw $e;
+            }
+        }
+
+        if (!empty($data['message'])) {
+            return false;
+        }
+
+        $this->setAttributes($data, false);
+        $this->afterSave();
+        return true;
     }
 
     public function refresh()
     {
-        if ($this->createOnly) {
-            throw new MailtankException('This mailtank model supports only refresh method.');
+        if (!$this->crud['read']) {
+            throw new MailtankException('This mailtank model doesnt supports refresh method.');
         }
 
         if (empty($this->url) || $this->getIsNewRecord()) {
@@ -217,10 +207,9 @@ abstract class MailtankRecord extends \CModel
      */
     public function beforeSave()
     {
-        if ($this->createOnly && !$this->getIsNewRecord()) {
-            throw new MailtankException('This mailtank model supports only insert method.');
-        }
-        return true;
+        if ($this->crud['create'] || $this->crud['update'])
+            return true;
+        throw new MailtankException('This mailtank model supports only insert and update methods.');
     }
 
     /**
@@ -268,7 +257,7 @@ abstract class MailtankRecord extends \CModel
      */
     public function delete()
     {
-        if ($this->createOnly || $this->getIsNewRecord()) {
+        if (!$this->crud['delete']) {
             throw new MailtankException('This mailtank model doesnt support delete method.');
         }
 
