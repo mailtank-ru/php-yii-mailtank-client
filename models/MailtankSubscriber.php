@@ -29,7 +29,7 @@ class MailtankSubscriber extends MailtankRecord
             array('email', 'length', 'max' => 255),
             array('email', 'required'),
             array('does_email_exist', 'boolean'),
-            array('id, tags, properties, does_email_exist', 'safe'),
+            array('id, tags, properties', 'safe'),
         );
     }
 
