@@ -15,6 +15,7 @@ class MailtankSubscriber extends MailtankRecord
 
     public $email;
     public $tags = array();
+    public $does_email_exist = true;
 
     public static function model($className = __CLASS__)
     {
@@ -27,6 +28,7 @@ class MailtankSubscriber extends MailtankRecord
             array('email', 'email'),
             array('email', 'length', 'max' => 255),
             array('email', 'required'),
+            array('does_email_exist', 'boolean'),
             array('id, tags, properties', 'safe'),
         );
     }
@@ -75,6 +77,7 @@ class MailtankSubscriber extends MailtankRecord
             'tags',
             'url',
             'properties',
+            'does_email_exist',
         ));
     }
 
